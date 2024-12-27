@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './schemas/user.schemas';
@@ -12,10 +16,20 @@ export class UserService {
 
   async login(loginUserDto: LoginUserDto): Promise<User> {
     const { nome, password } = loginUserDto;
-    return this.userModel.findOne({ nome, password }).exec();
+    const user = await this.userModel.findOne({ nome, password }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found or incorrect password');
+    }
+    return user;
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    const existingUser = await this.userModel
+      .findOne({ nome: createUserDto.nome })
+      .exec();
+    if (existingUser) {
+      throw new BadRequestException('User already exists');
+    }
     const createdUser = new this.userModel(createUserDto);
     return createdUser.save();
   }
@@ -24,12 +38,16 @@ export class UserService {
     id: string,
     updatePasswordDto: UpdatePasswordDto
   ): Promise<User> {
-    return this.userModel
+    const user = await this.userModel
       .findByIdAndUpdate(
         id,
         { password: updatePasswordDto.password },
         { new: true }
       )
       .exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 }
