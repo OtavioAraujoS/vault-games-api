@@ -5,7 +5,12 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://localhost/nest'), UserModule],
+  imports: [
+    MongooseModule.forRoot(
+      'mongodb+srv://otavioaraujo490:BiiTJas8zsM9OONG@cluster0.gqgds.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+    ),
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
