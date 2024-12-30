@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   Logger,
+  HttpStatus,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -59,14 +60,8 @@ export class UserService {
   async updatePassword(
     id: string,
     updatePasswordDto: UpdatePasswordDto
-  ): Promise<User> {
-    const user = await this.userModel
-      .findByIdAndUpdate(
-        id,
-        { password: updatePasswordDto.password },
-        { new: true }
-      )
-      .exec();
+  ): Promise<{ status: number; message: string }> {
+    const user = await this.userModel.findOne({ _id: id }).exec();
     if (!user) {
       this.logger.error(
         chalk.hex('#FF00FF')(
@@ -75,15 +70,22 @@ export class UserService {
       );
       throw new NotFoundException('User not found');
     }
+    await this.userModel
+      .findByIdAndUpdate(
+        id,
+        { password: updatePasswordDto.password },
+        { new: true }
+      )
+      .exec();
     this.logger.log(
       chalk.cyan(
         `Password updated for user ID: ${id} at ${new Date().toISOString()}`
       )
     );
-    return user;
+    return { status: HttpStatus.OK, message: 'Password updated successfully' };
   }
 
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: string): Promise<{ status: number; message: string }> {
     const user = await this.userModel.findOne({ _id: id }).exec();
     if (!user) {
       this.logger.error(
@@ -100,5 +102,6 @@ export class UserService {
         `User deleted for user ID: ${id} at ${new Date().toISOString()}`
       )
     );
+    return { status: HttpStatus.OK, message: 'User deleted successfully' };
   }
 }
