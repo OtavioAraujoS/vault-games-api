@@ -29,7 +29,7 @@ export class GameController {
     return this.gameService.create(createGameDto);
   }
 
-  @Put(':id')
+  @Put('/:id')
   async updateGame(
     @Param('id') id: string,
     @Body() createGameDto: CreateGameDto
@@ -37,7 +37,7 @@ export class GameController {
     return this.gameService.update(id, createGameDto);
   }
 
-  @Delete(':id')
+  @Delete('/:id')
   async removeGame(@Param('id') id: string) {
     return this.gameService.remove(id);
   }
