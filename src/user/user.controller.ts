@@ -1,8 +1,17 @@
-import { Controller, Post, Body, Put, Param, Delete } from '@nestjs/common';
-import { UserService } from './user.service';
-import { LoginUserDto } from './dto/login-user.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
@@ -23,11 +32,25 @@ export class UserController {
     @Param('id') id: string,
     @Body() updatePasswordDto: UpdatePasswordDto
   ) {
-    return this.userService.updatePassword(id, updatePasswordDto);
+    try {
+      return await this.userService.updatePassword(id, updatePasswordDto);
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Delete('delete/:id')
   async deleteUser(@Param('id') id: string) {
-    return this.userService.deleteUser(id);
+    try {
+      return await this.userService.deleteUser(id);
+    } catch (error) {
+      throw new HttpException(
+        error.message,
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
