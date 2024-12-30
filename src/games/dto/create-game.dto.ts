@@ -3,4 +3,5 @@ export class CreateGameDto {
   readonly description: string;
   readonly image: string;
   readonly status: string;
+  readonly userId: string;
 }
