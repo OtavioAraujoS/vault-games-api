@@ -82,4 +82,23 @@ export class UserService {
     );
     return user;
   }
+
+  async deleteUser(id: string): Promise<void> {
+    const user = await this.userModel.findOne({ _id: id }).exec();
+    if (!user) {
+      this.logger.error(
+        chalk.hex('#FF00FF')(
+          `User deletion failed for user ID: ${id} at ${new Date().toISOString()}`
+        )
+      );
+      throw new NotFoundException('User not found');
+    }
+
+    await this.userModel.deleteOne({ _id: user._id }).exec();
+    this.logger.log(
+      chalk.cyan(
+        `User deleted for user ID: ${id} at ${new Date().toISOString()}`
+      )
+    );
+  }
 }
