@@ -17,6 +17,9 @@ export class Game {
 
   @Prop({ default: 'Não Iniciado' })
   status: string;
+
+  @Prop({ required: true })
+  userId: string;
 }
 
 export type GameDocument = Game & Document;
