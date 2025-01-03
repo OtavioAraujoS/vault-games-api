@@ -9,7 +9,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
@@ -41,6 +41,7 @@ export class UserController {
     status: 404,
     description: 'User not found or incorrect password.',
   })
+  @ApiBody({ type: LoginUserDto })
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
     return this.userService.login(loginUserDto);
@@ -49,6 +50,7 @@ export class UserController {
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({ status: 201, description: 'User created.', type: User })
   @ApiResponse({ status: 400, description: 'User already exists.' })
+  @ApiBody({ type: CreateUserDto })
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
@@ -57,6 +59,7 @@ export class UserController {
   @ApiOperation({ summary: 'Update user password' })
   @ApiResponse({ status: 200, description: 'Password updated successfully.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiBody({ type: UpdatePasswordDto })
   @Put('update-password/:id')
   async updatePassword(
     @Param('id') id: string,
