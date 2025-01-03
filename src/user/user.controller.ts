@@ -9,15 +9,20 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User } from './schemas/user.schemas';
 import { UserService } from './user.service';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'Return all users.', type: [User] })
   @Get('all')
   async getAllUsers() {
     try {
@@ -30,16 +35,28 @@ export class UserController {
     }
   }
 
+  @ApiOperation({ summary: 'Login a user' })
+  @ApiResponse({ status: 200, description: 'User logged in.', type: User })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found or incorrect password.',
+  })
   @Post('login')
   async login(@Body() loginUserDto: LoginUserDto) {
     return this.userService.login(loginUserDto);
   }
 
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ status: 201, description: 'User created.', type: User })
+  @ApiResponse({ status: 400, description: 'User already exists.' })
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
+  @ApiOperation({ summary: 'Update user password' })
+  @ApiResponse({ status: 200, description: 'Password updated successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   @Put('update-password/:id')
   async updatePassword(
     @Param('id') id: string,
@@ -55,6 +72,9 @@ export class UserController {
     }
   }
 
+  @ApiOperation({ summary: 'Delete a user' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   @Delete('delete/:id')
   async deleteUser(@Param('id') id: string) {
     try {
