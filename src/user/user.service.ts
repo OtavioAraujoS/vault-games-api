@@ -19,6 +19,10 @@ export class UserService {
 
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
+  /**
+   * Fetches all users from the database.
+   * @returns {Promise<User[]>} A promise that resolves to an array of users.
+   */
   async getAllUsers(): Promise<User[]> {
     const users = await this.userModel.find().exec();
     this.logger.log(
@@ -27,6 +31,12 @@ export class UserService {
     return users;
   }
 
+  /**
+   * Logs in a user by checking their credentials.
+   * @param {LoginUserDto} loginUserDto - The login credentials.
+   * @returns {Promise<User>} A promise that resolves to the logged-in user.
+   * @throws {NotFoundException} If the user is not found or the password is incorrect.
+   */
   async login(loginUserDto: LoginUserDto): Promise<User> {
     const { nome, password } = loginUserDto;
     const user = await this.userModel.findOne({ nome, password }).exec();
@@ -44,6 +54,12 @@ export class UserService {
     return user;
   }
 
+  /**
+   * Creates a new user in the database.
+   * @param {CreateUserDto} createUserDto - The user data to create.
+   * @returns {Promise<User>} A promise that resolves to the created user.
+   * @throws {BadRequestException} If the user already exists.
+   */
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.userModel
       .findOne({ nome: createUserDto.nome })
@@ -65,6 +81,13 @@ export class UserService {
     return createdUser.save();
   }
 
+  /**
+   * Updates the password of an existing user.
+   * @param {string} id - The ID of the user.
+   * @param {UpdatePasswordDto} updatePasswordDto - The new password data.
+   * @returns {Promise<{ status: number; message: string }>} A promise that resolves to a status message.
+   * @throws {NotFoundException} If the user is not found.
+   */
   async updatePassword(
     id: string,
     updatePasswordDto: UpdatePasswordDto
@@ -93,6 +116,12 @@ export class UserService {
     return { status: HttpStatus.OK, message: 'Password updated successfully' };
   }
 
+  /**
+   * Deletes a user from the database.
+   * @param {string} id - The ID of the user.
+   * @returns {Promise<{ status: number; message: string }>} A promise that resolves to a status message.
+   * @throws {NotFoundException} If the user is not found.
+   */
   async deleteUser(id: string): Promise<{ status: number; message: string }> {
     const user = await this.userModel.findOne({ _id: id }).exec();
     if (!user) {
