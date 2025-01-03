@@ -22,7 +22,7 @@ export class UserService {
   async getAllUsers(): Promise<User[]> {
     const users = await this.userModel.find().exec();
     this.logger.log(
-      chalk.green(`Fetched all users at ${new Date().toISOString()}`)
+      chalk.greenBright(`Fetched all users at ${new Date().toISOString()}`)
     );
     return users;
   }
