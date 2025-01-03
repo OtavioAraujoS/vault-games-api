@@ -1,23 +1,31 @@
 import {
-  Injectable,
-  NotFoundException,
   BadRequestException,
-  Logger,
   HttpStatus,
+  Injectable,
+  Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schemas';
-import { LoginUserDto } from './dto/login-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
 import * as chalk from 'chalk';
+import { Model } from 'mongoose';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { User, UserDocument } from './schemas/user.schemas';
 
 @Injectable()
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async getAllUsers(): Promise<User[]> {
+    const users = await this.userModel.find().exec();
+    this.logger.log(
+      chalk.green(`Fetched all users at ${new Date().toISOString()}`)
+    );
+    return users;
+  }
 
   async login(loginUserDto: LoginUserDto): Promise<User> {
     const { nome, password } = loginUserDto;
