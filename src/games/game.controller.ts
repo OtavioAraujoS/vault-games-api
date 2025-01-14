@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CreateGameDto } from './dto/create-game.dto';
 import { GameService } from './game.service';
@@ -20,8 +21,11 @@ export class GameController {
   }
 
   @Get('user/:userId')
-  async getGamesByUser(@Param('userId') userId: string) {
-    return this.gameService.findByUser(userId);
+  async getGamesByUser(
+    @Param('userId') userId: string,
+    @Query('status') status?: string
+  ) {
+    return this.gameService.findByUser(userId, status);
   }
 
   @Post()
