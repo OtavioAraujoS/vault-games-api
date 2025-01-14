@@ -11,6 +11,9 @@ export class User {
 
   @Prop({ default: '12345' })
   password: string;
+
+  @Prop({ default: 'userPicture' })
+  picture: string;
 }
 
 export type UserDocument = User & Document;
