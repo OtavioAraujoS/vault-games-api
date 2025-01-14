@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -17,15 +17,39 @@ export class GameService {
     return games;
   }
 
-  async findByUser(userId: string): Promise<Game[]> {
+  async findByUser(userId: string, status?: string): Promise<Game[]> {
     this.logger.log(`Fetching games for user: ${userId}`);
-    const games = await this.gameModel.find({ userId }).exec();
+    const filter: any = { userId };
+    if (status) {
+      filter.status = status;
+    }
+    const games = await this.gameModel.find(filter).exec();
     this.logger.log(`Found ${games.length} games for user: ${userId}`);
     return games;
   }
 
   async create(createGameDto: CreateGameDto): Promise<Game> {
     this.logger.log('Creating a new game');
+
+    const requiredFields = ['nome', 'description', 'image', 'userId'];
+    for (const field of requiredFields) {
+      if (!createGameDto[field]) {
+        this.logger.error(`Missing required field: ${field}`);
+        throw new BadRequestException(`Missing required field: ${field}`);
+      }
+    }
+
+    const validStatuses = [
+      'Não Iniciado',
+      'Em Andamento',
+      'Pausado',
+      'Completo',
+    ];
+    if (createGameDto.status && !validStatuses.includes(createGameDto.status)) {
+      this.logger.error(`Invalid status: ${createGameDto.status}`);
+      throw new BadRequestException(`Invalid status: ${createGameDto.status}`);
+    }
+
     const newGame = new this.gameModel(createGameDto);
     const savedGame = await newGame.save();
     this.logger.log(`Created game with id: ${savedGame._id}`);
@@ -37,9 +61,25 @@ export class GameService {
     updateGameDto: Partial<CreateGameDto>
   ): Promise<Game> {
     this.logger.log(`Updating game with id: ${id}`);
+
+    const validStatuses = [
+      'Não Iniciado',
+      'Em Andamento',
+      'Pausado',
+      'Completo',
+    ];
+    if (updateGameDto.status && !validStatuses.includes(updateGameDto.status)) {
+      this.logger.error(`Invalid status: ${updateGameDto.status}`);
+      throw new BadRequestException(`Invalid status: ${updateGameDto.status}`);
+    }
+
     const updatedGame = await this.gameModel
       .findByIdAndUpdate(id, updateGameDto, { new: true })
       .exec();
+    if (!updatedGame) {
+      this.logger.error(`Game with id: ${id} not found`);
+      throw new BadRequestException(`Game with id: ${id} not found`);
+    }
     this.logger.log(`Updated game with id: ${updatedGame._id}`);
     return updatedGame;
   }
