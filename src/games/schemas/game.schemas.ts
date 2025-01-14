@@ -15,11 +15,20 @@ export class Game {
   @Prop({ default: Date.now })
   createdAt: Date;
 
-  @Prop({ default: 'Não Iniciado' })
+  @Prop({
+    default: 'Não Iniciado',
+    enum: ['Não Iniciado', 'Em Andamento', 'Pausado', 'Completo'],
+  })
   status: string;
 
   @Prop({ required: true })
   userId: string;
+
+  @Prop({ default: 30 })
+  hours: number;
+
+  @Prop({ default: 'Definitavemente Perfeito' })
+  review: string;
 }
 
 export type GameDocument = Game & Document;
