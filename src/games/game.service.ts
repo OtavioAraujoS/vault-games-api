@@ -39,12 +39,7 @@ export class GameService {
       }
     }
 
-    const validStatuses = [
-      'Não Iniciado',
-      'Em Andamento',
-      'Pausado',
-      'Completo',
-    ];
+    const validStatuses = ['Pendente', 'Progresso', 'Pausado', 'Completo'];
     if (createGameDto.status && !validStatuses.includes(createGameDto.status)) {
       this.logger.error(`Invalid status: ${createGameDto.status}`);
       throw new BadRequestException(`Invalid status: ${createGameDto.status}`);
@@ -62,12 +57,7 @@ export class GameService {
   ): Promise<Game> {
     this.logger.log(`Updating game with id: ${id}`);
 
-    const validStatuses = [
-      'Não Iniciado',
-      'Em Andamento',
-      'Pausado',
-      'Completo',
-    ];
+    const validStatuses = ['Pendente', 'Progresso', 'Pausado', 'Completo'];
     if (updateGameDto.status && !validStatuses.includes(updateGameDto.status)) {
       this.logger.error(`Invalid status: ${updateGameDto.status}`);
       throw new BadRequestException(`Invalid status: ${updateGameDto.status}`);

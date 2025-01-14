@@ -17,7 +17,7 @@ export class Game {
 
   @Prop({
     default: 'Não Iniciado',
-    enum: ['Não Iniciado', 'Em Andamento', 'Pausado', 'Completo'],
+    enum: ['Pendente', 'Progresso', 'Pausado', 'Completo'],
   })
   status: string;
 
