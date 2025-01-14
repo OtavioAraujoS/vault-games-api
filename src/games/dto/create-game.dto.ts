@@ -4,4 +4,6 @@ export class CreateGameDto {
   readonly image: string;
   readonly status: string;
   readonly userId: string;
+  readonly hours: number;
+  readonly review: string;
 }
