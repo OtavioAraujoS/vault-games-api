@@ -32,6 +32,30 @@ export class UserService {
   }
 
   /**
+   * Retrieves a user by ID.
+   * @param {string} id - The ID of the user.
+   * @returns {Promise<User>} A promise that resolves to the user data.
+   * @throws {NotFoundException} If the user is not found.
+   */
+  async getUserById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id).exec();
+    if (!user) {
+      this.logger.error(
+        chalk.hex('#FF00FF')(
+          `User retrieval failed for user ID: ${id} at ${new Date().toISOString()}`
+        )
+      );
+      throw new NotFoundException('User not found');
+    }
+    this.logger.log(
+      chalk.cyan(
+        `User retrieved for user ID: ${id} at ${new Date().toISOString()}`
+      )
+    );
+    return user;
+  }
+
+  /**
    * Logs in a user by checking their credentials.
    * @param {LoginUserDto} loginUserDto - The login credentials.
    * @returns {Promise<User>} A promise that resolves to the logged-in user.
