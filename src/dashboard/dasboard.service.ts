@@ -44,7 +44,11 @@ export class DashboardService {
     const gamesPerUser = await Promise.all(
       users.map(async (user: User) => {
         const games = await this.gameService.findByUser(user._id);
-        return { userId: user._id, gameCount: games.length };
+        return {
+          userId: user._id,
+          userName: user.nome,
+          gameCount: games.length,
+        };
       })
     );
     this.logger.log('Number of games per user fetched');
