@@ -35,6 +35,13 @@ export class UserController {
     }
   }
 
+  @ApiOperation({ summary: 'Get user infos' })
+  @ApiResponse({ status: 200, description: 'Return a user.', type: [User] })
+  @Get(':id')
+  async getUserById(@Param('id') id: string): Promise<User> {
+    return this.userService.getUserById(id);
+  }
+
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in.', type: User })
   @ApiResponse({
