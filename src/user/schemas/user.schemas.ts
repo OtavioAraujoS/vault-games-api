@@ -3,6 +3,9 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class User {
+  @Prop({ default: Math.random().toString(36).substring(7) })
+  _id: string;
+
   @Prop({ required: true })
   nome: string;
 
