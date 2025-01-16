@@ -48,6 +48,7 @@ export class DashboardService {
           userId: user._id,
           userName: user.nome,
           gameCount: games.length,
+          timePlayed: games.reduce((acc, game) => acc + game.hours, 0),
         };
       })
     );
