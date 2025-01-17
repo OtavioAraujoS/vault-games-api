@@ -1,4 +1,9 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -26,6 +31,17 @@ export class GameService {
     const games = await this.gameModel.find(filter).exec();
     this.logger.log(`Found ${games.length} games for user: ${userId}`);
     return games;
+  }
+
+  async findById(id: string): Promise<Game> {
+    this.logger.log(`Fetching game with id: ${id}`);
+    const game = await this.gameModel.findById(id).exec();
+    if (!game) {
+      this.logger.error(`Game with id: ${id} not found`);
+      throw new NotFoundException(`Game with id: ${id} not found`);
+    }
+    this.logger.log(`Found game with id: ${game._id}`);
+    return game;
   }
 
   async create(createGameDto: CreateGameDto): Promise<Game> {
