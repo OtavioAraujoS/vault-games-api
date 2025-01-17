@@ -20,6 +20,11 @@ export class GameController {
     return this.gameService.findAll();
   }
 
+  @Get('/:id')
+  async getGameById(@Param('id') id: string) {
+    return this.gameService.findById(id);
+  }
+
   @Get('user/:userId')
   async getGamesByUser(
     @Param('userId') userId: string,
