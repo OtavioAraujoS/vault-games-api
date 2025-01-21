@@ -47,6 +47,7 @@ export class DashboardService {
         return {
           userId: user._id,
           userName: user.nome,
+          userImage: user.picture,
           gameCount: games.length,
           timePlayed: games.reduce((acc, game) => acc + game.hours, 0),
         };
