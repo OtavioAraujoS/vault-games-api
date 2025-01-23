@@ -11,6 +11,7 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schemas';
 
 @Injectable()
@@ -103,6 +104,33 @@ export class UserService {
       )
     );
     return createdUser.save();
+  }
+
+  /**
+   * Updates the information of an existing user.
+   * @param {string} id - The ID of the user.
+   * @param {UpdateUserDto} updateUserDto - The updated user data.
+   * @returns {Promise<User>} A promise that resolves to the updated user.
+   * @throws {NotFoundException} If the user is not found.
+   */
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+    if (!updatedUser) {
+      this.logger.error(
+        chalk.red(
+          `User update failed: User with ID ${id} not found at ${new Date().toISOString()}`
+        )
+      );
+      throw new NotFoundException('User not found');
+    }
+    this.logger.log(
+      chalk.green(
+        `User updated: ${updatedUser.nome} at ${new Date().toISOString()}`
+      )
+    );
+    return updatedUser;
   }
 
   /**

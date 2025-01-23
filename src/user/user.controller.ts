@@ -13,6 +13,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './schemas/user.schemas';
 import { UserService } from './user.service';
 
@@ -61,6 +62,22 @@ export class UserController {
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @ApiOperation({ summary: 'Update user information' })
+  @ApiResponse({
+    status: 200,
+    description: 'User updated successfully.',
+    type: User,
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiBody({ type: UpdateUserDto })
+  @Put('update-infos/:id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto
+  ): Promise<User> {
+    return this.userService.updateUser(id, updateUserDto);
   }
 
   @ApiOperation({ summary: 'Update user password' })
