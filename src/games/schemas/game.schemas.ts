@@ -29,6 +29,9 @@ export class Game {
 
   @Prop({ default: 'Definitavemente Perfeito' })
   review: string;
+
+  @Prop({ default: Date.now })
+  updatedAt: Date;
 }
 
 export type GameDocument = Game & Document;
