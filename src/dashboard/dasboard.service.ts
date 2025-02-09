@@ -116,6 +116,29 @@ export class DashboardService {
   }
 
   /**
+   * Ranks users by the number of games they have registered.
+   * @returns {Promise<{ userId: string; userName: string; gameCount: number }[]>} A promise that resolves to an array of objects containing userId, userName, and gameCount.
+   */
+  async rankUsersByGameCount(): Promise<
+    { userId: string; userName: string; gameCount: number }[]
+  > {
+    this.logger.log('Ranking users by game count');
+    const users = await this.userService.getAllUsers();
+    const userGameCounts = await Promise.all(
+      users.map(async (user: User) => {
+        const games = await this.gameService.findByUser(user._id);
+        return {
+          userId: user._id,
+          userName: user.nome,
+          gameCount: games.length,
+        };
+      })
+    );
+    this.logger.log('Users ranked by game count');
+    return userGameCounts.sort((a, b) => b.gameCount - a.gameCount);
+  }
+
+  /**
    * Retrieves all dashboard information.
    * @returns {Promise<any>} A promise that resolves to an object containing all dashboard information.
    */
@@ -126,6 +149,7 @@ export class DashboardService {
     const gamesPerUser = await this.getGamesPerUser();
     const gameStatusDistribution = await this.getGameStatusDistribution();
     const currentPlayingGames = await this.getCurrentPlayingGames();
+    const rankedUsers = await this.rankUsersByGameCount();
     this.logger.log('All dashboard data fetched');
 
     return {
@@ -134,6 +158,7 @@ export class DashboardService {
       gamesPerUser,
       gameStatusDistribution,
       currentPlayingGames,
+      rankedUsers,
     };
   }
 }
