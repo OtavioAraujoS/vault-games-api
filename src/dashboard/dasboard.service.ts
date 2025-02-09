@@ -105,6 +105,7 @@ export class DashboardService {
           return {
             userId: user._id,
             userName: user.nome,
+            userImage: user.picture,
             game: mostRecentGame,
           };
         }
@@ -130,6 +131,7 @@ export class DashboardService {
         return {
           userId: user._id,
           userName: user.nome,
+          userImage: user.picture,
           gameCount: games.length,
         };
       })
@@ -149,7 +151,7 @@ export class DashboardService {
     const gamesPerUser = await this.getGamesPerUser();
     const gameStatusDistribution = await this.getGameStatusDistribution();
     const currentPlayingGames = await this.getCurrentPlayingGames();
-    const rankedUsers = await this.rankUsersByGameCount();
+    const rankedUsersByRegisteredGames = await this.rankUsersByGameCount();
     this.logger.log('All dashboard data fetched');
 
     return {
@@ -158,7 +160,7 @@ export class DashboardService {
       gamesPerUser,
       gameStatusDistribution,
       currentPlayingGames,
-      rankedUsers,
+      rankedUsersByRegisteredGames,
     };
   }
 }
