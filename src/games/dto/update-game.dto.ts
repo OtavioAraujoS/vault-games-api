@@ -5,4 +5,5 @@ export class UpdateGameDto {
   readonly status: string;
   readonly hours: number;
   readonly review: string;
+  readonly updatedAt: Date;
 }
