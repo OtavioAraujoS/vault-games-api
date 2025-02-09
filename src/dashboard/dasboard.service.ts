@@ -78,6 +78,44 @@ export class DashboardService {
   }
 
   /**
+   * Retrieves the games that users are currently playing (Status = "Em andamento").
+   * If a user has more than one game in progress, it returns the most recently updated one.
+   * If the game does not have an updatedAt field, it returns the first game in progress found.
+   * @returns {Promise<{ userId: string; userName: string; game: any }[]>} A promise that resolves to an array of objects containing userId, userName, and the game in progress.
+   */
+  async getCurrentPlayingGames(): Promise<
+    { userId: string; userName: string; game: any }[]
+  > {
+    this.logger.log('Fetching current playing games');
+    const users = await this.userService.getAllUsers();
+    const currentPlayingGames = await Promise.all(
+      users.map(async (user: User) => {
+        const games = await this.gameService.findByUser(user._id);
+        const inProgressGames = games.filter(
+          (game) => game.status === 'Progresso'
+        );
+        if (inProgressGames.length > 0) {
+          const mostRecentGame = inProgressGames.reduce((latest, game) => {
+            if (!latest.updatedAt) return game;
+            if (!game.updatedAt) return latest;
+            return new Date(game.updatedAt) > new Date(latest.updatedAt)
+              ? game
+              : latest;
+          }, inProgressGames[0]);
+          return {
+            userId: user._id,
+            userName: user.nome,
+            game: mostRecentGame,
+          };
+        }
+        return null;
+      })
+    );
+    this.logger.log('Current playing games fetched');
+    return currentPlayingGames.filter((game) => game !== null);
+  }
+
+  /**
    * Retrieves all dashboard information.
    * @returns {Promise<any>} A promise that resolves to an object containing all dashboard information.
    */
@@ -87,6 +125,7 @@ export class DashboardService {
     const totalGames = await this.getTotalGames();
     const gamesPerUser = await this.getGamesPerUser();
     const gameStatusDistribution = await this.getGameStatusDistribution();
+    const currentPlayingGames = await this.getCurrentPlayingGames();
     this.logger.log('All dashboard data fetched');
 
     return {
@@ -94,6 +133,7 @@ export class DashboardService {
       totalGames,
       gamesPerUser,
       gameStatusDistribution,
+      currentPlayingGames,
     };
   }
 }
