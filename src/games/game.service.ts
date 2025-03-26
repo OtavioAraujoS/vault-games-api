@@ -44,6 +44,30 @@ export class GameService {
     return game;
   }
 
+  async getLastGamesUpdated(): Promise<Game[]> {
+    try {
+      this.logger.log('Fetching last games updated');
+      const games = await this.gameModel
+        .find({}, { _id: 1, nome: 1, updatedAt: 1 })
+        .sort({ updatedAt: -1 })
+        .limit(5)
+        .exec();
+
+      if (!games || games.length === 0) {
+        this.logger.warn('No games found');
+        return [];
+      }
+
+      this.logger.log(`Found ${games.length} games`);
+      return games;
+    } catch (error) {
+      this.logger.error(`Error fetching games: ${error.message}`, error.stack);
+      throw new BadRequestException(
+        'Error fetching games. Please try again later.'
+      );
+    }
+  }
+
   async create(createGameDto: CreateGameDto): Promise<Game> {
     this.logger.log('Creating a new game');
 
