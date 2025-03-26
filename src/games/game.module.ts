@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UserService } from 'src/user/user.service';
+import { UserModule } from '../user/user.module';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
-import { UserModule } from '../user/user.module';
 import { Game, GameSchema } from './schemas/game.schemas';
 
 @Module({
@@ -11,6 +12,7 @@ import { Game, GameSchema } from './schemas/game.schemas';
     UserModule,
   ],
   controllers: [GameController],
-  providers: [GameService],
+  providers: [GameService, UserService],
+  exports: [MongooseModule, UserService],
 })
 export class GameModule {}
