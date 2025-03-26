@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { User, UserDocument } from 'src/user/schemas/user.schemas';
 import { CreateGameDto } from './dto/create-game.dto';
 import { Game, GameDocument } from './schemas/game.schemas';
 
@@ -13,7 +14,10 @@ import { Game, GameDocument } from './schemas/game.schemas';
 export class GameService {
   private readonly logger = new Logger(GameService.name);
 
-  constructor(@InjectModel(Game.name) private gameModel: Model<GameDocument>) {}
+  constructor(
+    @InjectModel(Game.name) private gameModel: Model<GameDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>
+  ) {}
 
   async findAll(): Promise<Game[]> {
     this.logger.log('Fetching all games');
@@ -47,10 +51,12 @@ export class GameService {
   async getLastGamesUpdated(): Promise<Game[]> {
     try {
       this.logger.log('Fetching last games updated');
+
       const games = await this.gameModel
-        .find({}, { _id: 1, nome: 1, updatedAt: 1 })
+        .find({}, { _id: 1, nome: 1, updatedAt: 1, updatedBy: 1, userId: 1 })
         .sort({ updatedAt: -1 })
         .limit(5)
+        .lean()
         .exec();
 
       if (!games || games.length === 0) {
@@ -58,8 +64,30 @@ export class GameService {
         return [];
       }
 
+      const userIds = games.map((game) => game.userId);
+      const users = await this.userModel
+        .find({ _id: { $in: userIds } })
+        .lean()
+        .exec();
+
+      const formattedGames = games.map((game) => {
+        const user = users.find(
+          (user) => String(user._id) === String(game.userId)
+        );
+        return {
+          ...game,
+          user: user
+            ? {
+                id: user._id,
+                name: user.nome,
+                picture: user.picture,
+              }
+            : 'Unknown',
+        };
+      });
+
       this.logger.log(`Found ${games.length} games`);
-      return games;
+      return formattedGames;
     } catch (error) {
       this.logger.error(`Error fetching games: ${error.message}`, error.stack);
       throw new BadRequestException(
@@ -71,12 +99,41 @@ export class GameService {
   async getLastGamesUpdatedByUser(userId: string): Promise<Game[]> {
     this.logger.log(`Fetching last games updated for user: ${userId}`);
     const games = await this.gameModel
-      .find({ userId })
+      .find({ userId }, { _id: 1, nome: 1, updatedAt: 1, updatedBy: 1 })
       .sort({ updatedAt: -1 })
+      .lean()
       .limit(5)
       .exec();
+
+    if (!games || games.length === 0) {
+      this.logger.warn('No games found');
+      return [];
+    }
+
+    const userIds = games.map((game) => game.userId);
+    const users = await this.userModel
+      .find({ _id: { $in: userIds } })
+      .lean()
+      .exec();
+
+    const formattedGames = games.map((game) => {
+      const user = users.find(
+        (user) => String(user._id) === String(game.userId)
+      );
+      return {
+        ...game,
+        user: user
+          ? {
+              id: user._id,
+              name: user.nome,
+              picture: user.picture,
+            }
+          : 'Unknown',
+      };
+    });
+
     this.logger.log(`Found ${games.length} games for user: ${userId}`);
-    return games;
+    return formattedGames;
   }
 
   async create(createGameDto: CreateGameDto): Promise<Game> {
