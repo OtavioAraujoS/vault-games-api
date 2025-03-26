@@ -68,6 +68,17 @@ export class GameService {
     }
   }
 
+  async getLastGamesUpdatedByUser(userId: string): Promise<Game[]> {
+    this.logger.log(`Fetching last games updated for user: ${userId}`);
+    const games = await this.gameModel
+      .find({ userId })
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .exec();
+    this.logger.log(`Found ${games.length} games for user: ${userId}`);
+    return games;
+  }
+
   async create(createGameDto: CreateGameDto): Promise<Game> {
     this.logger.log('Creating a new game');
 
