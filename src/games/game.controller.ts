@@ -38,6 +38,11 @@ export class GameController {
     return this.gameService.findByUser(userId, status);
   }
 
+  @Get('last-updated/user/:userId')
+  async getLastGamesUpdatedByUser(@Param('userId') userId: string) {
+    return this.gameService.getLastGamesUpdatedByUser(userId);
+  }
+
   @Post()
   async createGame(@Body() createGameDto: CreateGameDto) {
     return this.gameService.create(createGameDto);
