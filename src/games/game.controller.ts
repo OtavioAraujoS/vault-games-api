@@ -20,6 +20,11 @@ export class GameController {
     return this.gameService.findAll();
   }
 
+  @Get('last-updated')
+  async getLastGamesUpdated() {
+    return this.gameService.getLastGamesUpdated();
+  }
+
   @Get('/:id')
   async getGameById(@Param('id') id: string) {
     return this.gameService.findById(id);
