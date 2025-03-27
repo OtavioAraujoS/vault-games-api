@@ -43,6 +43,11 @@ export class GameController {
     return this.gameService.getLastGamesUpdatedByUser(userId);
   }
 
+  @Get('distribution/user/:userId')
+  async getGamesDistributionByUser(@Param('userId') userId: string) {
+    return this.gameService.getGameDistributionByUser(userId);
+  }
+
   @Post()
   async createGame(@Body() createGameDto: CreateGameDto) {
     return this.gameService.create(createGameDto);
