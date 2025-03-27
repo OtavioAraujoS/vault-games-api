@@ -53,7 +53,10 @@ export class GameService {
       this.logger.log('Fetching last games updated');
 
       const games = await this.gameModel
-        .find({}, { _id: 1, nome: 1, updatedAt: 1, updatedBy: 1, userId: 1 })
+        .find(
+          {},
+          { _id: 1, nome: 1, updatedAt: 1, updatedBy: 1, userId: 1, image: 1 }
+        )
         .sort({ updatedAt: -1 })
         .limit(5)
         .lean()
@@ -99,7 +102,10 @@ export class GameService {
   async getLastGamesUpdatedByUser(userId: string): Promise<Game[]> {
     this.logger.log(`Fetching last games updated for user: ${userId}`);
     const games = await this.gameModel
-      .find({ userId }, { _id: 1, nome: 1, updatedAt: 1, updatedBy: 1 })
+      .find(
+        { userId },
+        { _id: 1, nome: 1, updatedAt: 1, updatedBy: 1, image: 1 }
+      )
       .sort({ updatedAt: -1 })
       .lean()
       .limit(5)
