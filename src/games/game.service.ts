@@ -178,7 +178,11 @@ export class GameService {
     }
 
     const updatedGame = await this.gameModel
-      .findByIdAndUpdate(id, updateGameDto, { new: true })
+      .findByIdAndUpdate(
+        id,
+        { ...updateGameDto, updatedAt: new Date() },
+        { new: true }
+      )
       .exec();
     if (!updatedGame) {
       this.logger.error(`Game with id: ${id} not found`);
