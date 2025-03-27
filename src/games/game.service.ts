@@ -99,6 +99,29 @@ export class GameService {
     }
   }
 
+  async getGameDistributionByUser(userId: string): Promise<any> {
+    this.logger.log(`Fetching game distribution for user: ${userId}`);
+    const games = await this.gameModel
+      .aggregate([
+        { $match: { userId } },
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .exec();
+
+    const distribution = games.reduce((acc, game) => {
+      acc[game._id] = game.count;
+      return acc;
+    }, {});
+
+    this.logger.log(`Found game distribution for user: ${userId}`);
+    return distribution;
+  }
+
   async getLastGamesUpdatedByUser(userId: string): Promise<Game[]> {
     this.logger.log(`Fetching last games updated for user: ${userId}`);
     const games = await this.gameModel
