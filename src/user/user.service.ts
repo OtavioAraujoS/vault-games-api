@@ -38,8 +38,8 @@ export class UserService {
    * @returns {Promise<User>} A promise that resolves to the user data.
    * @throws {NotFoundException} If the user is not found.
    */
-  async getUserById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).exec();
+  async getUserById(id: string, userWhoRequested: string): Promise<User> {
+    const user = await this.userModel.findById(id).lean().exec();
     if (!user) {
       this.logger.error(
         chalk.hex('#FF00FF')(
@@ -53,7 +53,10 @@ export class UserService {
         `User retrieved for user ID: ${id} at ${new Date().toISOString()}`
       )
     );
-    return user;
+    return {
+      ...user,
+      password: userWhoRequested === id ? user.password : undefined,
+    };
   }
 
   /**
