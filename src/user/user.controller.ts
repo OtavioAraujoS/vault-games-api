@@ -39,8 +39,14 @@ export class UserController {
   @ApiOperation({ summary: 'Get user infos' })
   @ApiResponse({ status: 200, description: 'Return a user.', type: [User] })
   @Get(':id')
-  async getUserById(@Param('id') id: string): Promise<User> {
-    return this.userService.getUserById(id);
+  async getUserById(
+    @Param('id') id: string,
+    @Body('userWhoRequest') userWhoRequest: string
+  ): Promise<User> {
+    if (!userWhoRequest) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    return this.userService.getUserById(id, userWhoRequest);
   }
 
   @ApiOperation({ summary: 'Login a user' })
