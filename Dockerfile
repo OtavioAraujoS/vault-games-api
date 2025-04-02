@@ -5,7 +5,7 @@ FROM node:18
 WORKDIR /src
 
 # Copiando apenas os arquivos necessários para instalar as dependências
-COPY package*.json ./
+COPY package*.json tsconfig*.json ./
 
 # Instalando as dependências do projeto
 RUN npm install
