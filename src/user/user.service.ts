@@ -35,11 +35,13 @@ export class UserService {
   /**
    * Retrieves a user by ID.
    * @param {string} id - The ID of the user.
+   * @param {string} userWhoRequested - The ID of the user making the request.
    * @returns {Promise<User>} A promise that resolves to the user data.
    * @throws {NotFoundException} If the user is not found.
    */
   async getUserById(id: string, userWhoRequested: string): Promise<User> {
     const user = await this.userModel.findById(id).lean().exec();
+
     if (!user) {
       this.logger.error(
         chalk.hex('#FF00FF')(
@@ -48,11 +50,13 @@ export class UserService {
       );
       throw new NotFoundException('User not found');
     }
+
     this.logger.log(
       chalk.cyan(
         `User retrieved for user ID: ${id} at ${new Date().toISOString()}`
       )
     );
+
     return {
       ...user,
       password: userWhoRequested === id ? user.password : undefined,
