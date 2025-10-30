@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpException,
   HttpStatus,
   Param,
@@ -41,7 +42,7 @@ export class UserController {
   @Get(':id')
   async getUserById(
     @Param('id') id: string,
-    @Body('userWhoRequest') userWhoRequest: string
+    @Headers('userWhoRequest') userWhoRequest: string
   ): Promise<User> {
     if (!userWhoRequest) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
