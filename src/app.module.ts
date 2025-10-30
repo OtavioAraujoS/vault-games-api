@@ -8,9 +8,18 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASSWORD}@cluster0.gqgds.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
-    ),
+    MongooseModule.forRootAsync({
+      useFactory: async () => ({
+        uri: `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPASSWORD}@cluster0.gqgds.mongodb.net/?appName=Cluster0&retryWrites=true&w=majority`,
+        connectionFactory: (connection) => {
+          connection.on('error', (err) =>
+            console.error('Mongoose connection error:', err)
+          );
+          return connection;
+        },
+      }),
+    }),
+
     UserModule,
     GameModule,
     DashboardModule,
